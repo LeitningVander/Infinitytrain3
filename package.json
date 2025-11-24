@@ -7,7 +7,6 @@
     "dev:client": "vite dev --port 5000",
     "dev": "NODE_ENV=development tsx server/index-dev.ts",
     "build": "vite build && esbuild server/index-prod.ts --platform=node --packages=external --bundle --format=esm --outfile=dist/index.js",
-    "build:exe": "npm run build && pkg dist/index.js --targets node20-win-x64 --output InfinityTrain.exe --config package.json",
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc"
   },
@@ -85,17 +84,10 @@
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
-    "pkg": "^5.8.1",
     "postcss": "^8.5.6",
     "tsx": "^4.20.5",
     "typescript": "5.6.3",
     "vite": "^7.1.9"
-  },
-  "pkg": {
-    "assets": [
-      "client/dist/**/*"
-    ],
-    "outputPath": "build"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"

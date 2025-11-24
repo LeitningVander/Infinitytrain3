@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: infinitytrain
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.0
+      - key: RENDER
+        value: true
+    disk:
+      name: infinitytrain-data
+      mountPath: /opt/render/project/data
+      sizeGB: 1

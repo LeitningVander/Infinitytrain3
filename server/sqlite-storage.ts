@@ -64,9 +64,10 @@ export class SQLiteStorage implements IStorage {
   private db: Database.Database;
 
   constructor(dbPath?: string) {
-    // Store database in user's data directory or current directory
-    const defaultPath = process.env.APPDATA 
-      ? path.join(process.env.APPDATA, 'InfinityTrain', 'training.db')
+    // For Render, use /opt/render/project/data for persistent storage
+    // For local development, use current directory
+    const defaultPath = process.env.RENDER 
+      ? '/opt/render/project/data/training.db'
       : path.join(process.cwd(), 'training.db');
     
     const finalPath = dbPath || defaultPath;
