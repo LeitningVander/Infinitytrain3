@@ -1,67 +1,41 @@
-import fs from "node:fs";
+import { createServer as createViteServer, type ViteDevServer } from "vite";
 import { type Server } from "node:http";
-import path from "node:path";
-
-import type { Express } from "express";
-import { nanoid } from "nanoid";
-import { createServer as createViteServer, createLogger } from "vite";
-
+import { type Express } from "express";
 import runApp from "./app";
 
-import viteConfig from "../vite.config";
-
-const viteLogger = createLogger();
-
-export async function setupVite(app: Express, server: Server) {
-  const serverOptions = {
-    middlewareMode: true,
-    hmr: { server },
-    allowedHosts: true as const,
-  };
-
+export async function injectViteMiddleware(
+  app: Express,
+  server: Server,
+) {
   const vite = await createViteServer({
-    ...viteConfig,
-    configFile: false,
-    customLogger: {
-      ...viteLogger,
-      error: (msg, options) => {
-        viteLogger.error(msg, options);
-        process.exit(1);
-      },
-    },
-    server: serverOptions,
+    server: { middlewareMode: true },
     appType: "custom",
   });
 
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/api/')) {
-      return next();
-    }
-    vite.middlewares(req, res, next);
-  });
+  app.use(vite.middlewares);
 
+  // handle all requests that are not api routes
   app.use("*", async (req, res, next) => {
-    if (req.path.startsWith('/api/')) {
-      return next();
-    }
     const url = req.originalUrl;
 
     try {
-      const clientTemplate = path.resolve(
-        import.meta.dirname,
-        "..",
-        "client",
-        "index.html",
+      const clientTemplate = await vite.transformIndexHtml(
+        url,
+        `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InfinityTrain</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>`,
       );
 
-      // always reload the index.html file from disk incase it changes
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`,
-      );
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      res.status(200).set({ "Content-Type": "text/html" }).end(clientTemplate);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
@@ -70,5 +44,5 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 (async () => {
-  await runApp(setupVite);
+  await runApp(injectViteMiddleware);
 })();

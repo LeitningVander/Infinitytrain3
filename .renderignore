@@ -1,0 +1,19 @@
+# Development files
+*.md
+!README.md
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts (will be rebuilt on Render)
+dist/
+
+# Database (will be created fresh or from persistent disk)
+*.db
+*.db-shm
+*.db-wal
