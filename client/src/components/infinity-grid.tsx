@@ -93,7 +93,7 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
 
   return (
     <div className="w-full py-8">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 place-items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-16 place-items-center">
         {activeTopics.map((topic, index) => {
           const IconComponent = (LucideIcons as any)[topic.icon] || LucideIcons.HelpCircle;
 
@@ -129,8 +129,15 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
               </Link>
               
               <span 
-                className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs font-bold text-center px-3 py-1 leading-tight text-white bg-white rounded-md whitespace-nowrap text-ellipsis w-24"
-                style={{ fontSize: '0.75rem', backgroundColor: 'white', color: 'white', textShadow: '0 0 3px rgba(0,0,0,0.5)' }}
+                className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-xs font-bold text-center px-2 py-1 leading-tight rounded-md max-w-[8rem]"
+                style={{ 
+                  fontSize: '0.75rem', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                  color: '#1f2937',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word'
+                }}
               >
                 {topic.title}
               </span>
