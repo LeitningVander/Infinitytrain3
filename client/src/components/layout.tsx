@@ -41,13 +41,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const displayUser = viewAsUser || currentUser;
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground flex flex-col">
+    <div className="min-h-screen bg-white font-sans text-foreground flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b bg-card/80 backdrop-blur-md supports-[backdrop-filter]:bg-card/60">
+      <header className="sticky top-0 z-40 w-full border-b bg-white shadow-sm">
         <div className="w-full flex h-16 items-center justify-between px-4 md:px-6">
           {/* Profile Picture Top-Left */}
           <div className="flex items-center gap-3">
-            <img src={displayUser.avatar} alt={displayUser.name} className="h-10 w-10 rounded-full ring-2 ring-secondary/20" />
+            <img src={displayUser.avatar} alt={displayUser.name} className="h-10 w-10 rounded-full ring-2 ring-primary/20" />
             <div className="flex flex-col">
               <p className="font-medium leading-none text-sm">
                 {displayUser.name}
@@ -59,11 +59,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Center Navigation - Hidden on mobile */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium absolute left-1/2 transform -translate-x-1/2">
-            <Link href="/" className={cn("transition-colors hover:text-secondary", location === '/' ? "text-secondary" : "text-muted-foreground")}>
+            <Link href="/" className={cn("transition-colors hover:text-primary", location === '/' ? "text-primary font-semibold" : "text-foreground")}>
               Training Modules
             </Link>
             {currentUser.role === 'admin' && (
-              <Link href="/admin" className={cn("transition-colors hover:text-secondary", location === '/admin' ? "text-secondary" : "text-muted-foreground")}>
+              <Link href="/admin" className={cn("transition-colors hover:text-primary", location === '/admin' ? "text-primary font-semibold" : "text-foreground")}>
                 Admin Panel
               </Link>
             )}

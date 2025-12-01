@@ -108,7 +108,7 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
                     "flex flex-col items-center justify-center cursor-pointer group relative",
                     "rounded-full",
                     "shadow-lg hover:shadow-xl border-4 border-white transition-all duration-300",
-                    "hover:scale-110 hover:border-secondary"
+                    "hover:scale-110 hover:border-primary"
                   )}
                   style={{
                      background: getPieChartBackground(topic),

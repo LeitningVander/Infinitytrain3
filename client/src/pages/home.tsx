@@ -96,7 +96,7 @@ export default function Home() {
     <Layout>
       <div className="flex flex-col items-center justify-center gap-8 w-full">
         <div className="text-center space-y-4 max-w-2xl mx-auto mt-8 relative w-full">
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-black tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-primary tracking-tight">
             Training Modules
           </h1>
           <p className="text-lg text-muted-foreground">
@@ -110,11 +110,11 @@ export default function Home() {
                   <DialogTrigger asChild>
                     <Button 
                       size="icon" 
-                      className="rounded-full h-12 w-12 shadow-lg bg-secondary hover:bg-secondary/90" 
+                      className="rounded-full h-12 w-12 shadow-lg bg-primary hover:bg-primary/90" 
                       onClick={() => handleOpenDialog()}
                       title="Add New Module"
                     >
-                      <Plus className="h-6 w-6 text-black" />
+                      <Plus className="h-6 w-6 text-white" />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px] bg-white text-black border-none shadow-2xl">

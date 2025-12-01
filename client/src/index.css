@@ -59,44 +59,47 @@
   --font-hand: "Kalam", cursive;
 }
 
-/* Ocean Infinity Inspired Theme */
+/* New Color Scheme: Blue #0078D4 (10%), Green #107C10 (5%), White #FFFFFF (85%) */
 :root {
   --radius: 0.75rem;
 
-  /* Brand Blue #49A7FF - Used as Background */
-  --primary: 209 100% 64%; 
-  --primary-foreground: 156 38% 52%; /* Green Text on Blue? Or white? Let's stick to user request */
+  /* Blue #0078D4 - Primary accent color (10% of UI) */
+  --primary: 207 100% 42%; /* #0078D4 */
+  --primary-foreground: 0 0% 100%; /* White text on blue */
 
-  /* Brand Green #48BF91 */
-  --secondary: 156 38% 52%;
-  --secondary-foreground: 0 0% 100%;
+  /* Green #107C10 - Secondary accent color (5% of UI) */
+  --secondary: 120 78% 27%; /* #107C10 */
+  --secondary-foreground: 0 0% 100%; /* White text on green */
 
-  /* Global Background is Blue, Text is Green */
-  --background: 209 100% 64%;
-  --foreground: 156 38% 52%; /* Green text */
+  /* White #FFFFFF - Main background (85% of UI) */
+  --background: 0 0% 100%; /* White */
+  --foreground: 0 0% 20%; /* Dark gray text for readability */
 
-  /* Keeping cards white for readability, with green text */
+  /* Cards and surfaces - White */
   --card: 0 0% 100%;
-  --card-foreground: 156 38% 52%;
+  --card-foreground: 0 0% 20%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 156 38% 52%;
+  --popover-foreground: 0 0% 20%;
 
-  --muted: 210 20% 94%;
-  --muted-foreground: 156 38% 40%;
+  /* Muted colors - Light gray for subtle elements */
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
 
-  --accent: 156 38% 95%;
-  --accent-foreground: 156 38% 40%;
+  /* Accent - Light blue tint */
+  --accent: 207 100% 95%;
+  --accent-foreground: 207 100% 42%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
 
-  --border: 215 20% 90%;
-  --input: 215 20% 90%;
-  --ring: 156 38% 52%;
+  /* Borders - Very light gray */
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 207 100% 42%; /* Blue focus ring */
 
-  --chart-1: 156 38% 52%;
-  --chart-2: 215 55% 15%;
+  --chart-1: 207 100% 42%;
+  --chart-2: 120 78% 27%;
   --chart-3: 190 60% 50%;
   --chart-4: 215 40% 40%;
   --chart-5: 190 85% 25%;
