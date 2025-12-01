@@ -64,15 +64,17 @@ export function TrainingProvider({ children }: { children: React.ReactNode }) {
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load users from backend
+  // Load initial data
   useEffect(() => {
-    const loadUsers = async () => {
+    const loadInitialData = async () => {
       try {
+        // Fetch topics first to get all data
         const topicsRes = await fetch('/api/topics');
         const topicsData = await topicsRes.json();
+        setTopics(topicsData);
         
-        // Extract unique user IDs from comments and progress
-        const userIds = new Set<string>();
+        // Extract unique user IDs from all topics/comments
+        const userIds = new Set<string>(['u1', 'u2', 'u3', 'u4', 'u5', 'u6']); // Include all possible users
         topicsData.forEach((topic: Topic) => {
           topic.subtopics.forEach(subtopic => {
             subtopic.comments.forEach(comment => {
@@ -83,51 +85,45 @@ export function TrainingProvider({ children }: { children: React.ReactNode }) {
         
         // Fetch all users
         const userPromises = Array.from(userIds).map(id => 
-          fetch(`/api/users/${id}`).then(r => r.json())
+          fetch(`/api/users/${id}`).then(r => r.ok ? r.json() : null).catch(() => null)
         );
-        const usersData = await Promise.all(userPromises);
+        const usersData = (await Promise.all(userPromises)).filter(u => u !== null);
         setUsers(usersData);
         
-        // Set first user as default if not set
-        if (!currentUser && usersData.length > 0) {
-          setCurrentUser(usersData[0]);
+        // Set first user as default (Admin)
+        if (usersData.length > 0) {
+          const admin = usersData.find(u => u.role === 'admin') || usersData[0];
+          setCurrentUser(admin);
         }
+        
+        setIsLoading(false);
       } catch (error) {
-        console.error('Failed to load users:', error);
+        console.error('Failed to load initial data:', error);
+        setIsLoading(false);
       }
     };
-    loadUsers();
+    loadInitialData();
   }, []);
 
-  // Load topics and progress from backend
+  // Load progress when user changes
   useEffect(() => {
     if (!currentUser) return;
     
     const loadData = async () => {
       try {
-        const [topicsRes, progressRes] = await Promise.all([
-          fetch('/api/topics'),
-          fetch(`/api/progress/${currentUser.id}`)
-        ]);
-
-        if (topicsRes.ok) {
-          const topicsData = await topicsRes.json();
-          setTopics(topicsData);
-        }
+        const progressRes = await fetch(`/api/progress/${currentUser.id}`);
 
         if (progressRes.ok) {
           const progressData = await progressRes.json();
           setProgress(progressData);
         }
       } catch (error) {
-        console.error('Failed to load data:', error);
-      } finally {
-        setIsLoading(false);
+        console.error('Failed to load progress:', error);
       }
     };
 
     loadData();
-  }, [currentUser.id]);
+  }, [currentUser]);
 
   const updateProgress = (subtopicId: string, status: ProgressStatus) => {
     const newProgress: UserProgress = {
