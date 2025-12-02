@@ -96,10 +96,10 @@ export default function Home() {
     <Layout>
       <div className="flex flex-col items-center justify-center gap-8 w-full">
         <div className="text-center space-y-4 max-w-2xl mx-auto mt-8 relative w-full">
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-primary tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold tracking-tight text-white">
             Training Modules
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-white">
             Select a module from the infinity path below to begin your learning journey.
           </p>
 
