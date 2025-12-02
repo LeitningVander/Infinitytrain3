@@ -167,21 +167,24 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
               className="relative group w-fit"
             >
               <Link href={`/topic/${topic.id}`}>
-                <div className="relative" style={{ padding: `${strokeWidth}px` }}>
+                <div className="relative inline-block">
                   {/* Progress border using CSS */}
                   <div 
                     className={cn(
-                      "absolute inset-0",
+                      "absolute inset-0 pointer-events-none",
                       topicImage ? "rounded-3xl" : "rounded-full"
                     )}
                     style={{
                       background: `conic-gradient(from 0deg, #7acc00 0deg ${progressPercent * 3.6}deg, #FFFFFF ${progressPercent * 3.6}deg 360deg)`,
-                      padding: `${strokeWidth}px`,
                       WebkitMask: topicImage 
                         ? `linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)`
                         : `radial-gradient(farthest-side, transparent calc(100% - ${strokeWidth}px), #fff calc(100% - ${strokeWidth}px))`,
                       WebkitMaskComposite: 'xor',
                       maskComposite: 'exclude',
+                      mask: topicImage
+                        ? `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`
+                        : undefined,
+                      padding: `${strokeWidth}px`,
                       transition: 'background 0.5s ease'
                     }}
                   />
@@ -197,7 +200,8 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
                     style={{
                       background: topicImage ? 'transparent' : getPieChartBackground(topic),
                       width: `${containerSize}rem`,
-                      height: `${containerSize}rem`
+                      height: `${containerSize}rem`,
+                      margin: `${strokeWidth}px`
                     }}
                   >
                   {topicImage ? (
