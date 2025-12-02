@@ -180,8 +180,9 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
                   backgroundColor: '#107C10', 
                   color: '#FFFFFF',
                   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  whiteSpace: 'normal',
-                  wordBreak: 'break-word',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                   minWidth: '7rem',
                   maxWidth: '10rem'
                 }}
