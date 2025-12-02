@@ -41,7 +41,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const displayUser = viewAsUser || currentUser;
 
   return (
-    <div className="min-h-screen bg-white font-sans text-foreground flex flex-col">
+    <div className="min-h-screen bg-white font-sans text-foreground flex flex-col" style={{ 
+      backgroundImage: 'url(/images/background.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>
       {/* Header */}
       <header className="sticky top-0 z-40 w-full border-b shadow-sm" style={{ background: 'linear-gradient(to right, #003A63, #005A9E)' }}>
         <div className="w-full flex h-16 items-center justify-between px-4 md:px-6">
