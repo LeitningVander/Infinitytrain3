@@ -169,30 +169,35 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
               className="relative group w-fit"
             >
               <Link href={`/topic/${topic.id}`}>
-                <div className="relative" style={{ width: `${7 * scaleFactor}rem`, height: `${7 * scaleFactor}rem` }}>
-                  {/* Progress Ring SVG */}
+                <div className="relative inline-block">
+                  {/* Progress Ring SVG - positioned behind */}
                   <svg
-                    className="absolute inset-0 -rotate-90"
-                    width={size}
-                    height={size}
+                    className="absolute -rotate-90"
+                    style={{
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%) rotate(-90deg)',
+                      width: `${7 * scaleFactor}rem`,
+                      height: `${7 * scaleFactor}rem`
+                    }}
                   >
                     {/* Background ring (white) */}
                     <circle
-                      cx={size / 2}
-                      cy={size / 2}
-                      r={radius}
+                      cx={`${3.5 * scaleFactor}rem`}
+                      cy={`${3.5 * scaleFactor}rem`}
+                      r={`${3.5 * scaleFactor - 0.1875}rem`}
                       fill="none"
                       stroke="#FFFFFF"
-                      strokeWidth={strokeWidth}
+                      strokeWidth="6"
                     />
                     {/* Progress ring (lime green) */}
                     <circle
-                      cx={size / 2}
-                      cy={size / 2}
-                      r={radius}
+                      cx={`${3.5 * scaleFactor}rem`}
+                      cy={`${3.5 * scaleFactor}rem`}
+                      r={`${3.5 * scaleFactor - 0.1875}rem`}
                       fill="none"
                       stroke="#7acc00"
-                      strokeWidth={strokeWidth}
+                      strokeWidth="6"
                       strokeDasharray={circumference}
                       strokeDashoffset={strokeDashoffset}
                       strokeLinecap="round"
@@ -203,14 +208,15 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
                   {/* Topic Content */}
                   <div
                     className={cn(
-                      "absolute inset-0 flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden",
+                      "flex flex-col items-center justify-center cursor-pointer relative overflow-hidden",
                       topicImage ? "rounded-3xl" : "rounded-full",
                       "shadow-lg hover:shadow-xl transition-all duration-300",
                       "hover:scale-105"
                     )}
                     style={{
                       background: topicImage ? 'transparent' : getPieChartBackground(topic),
-                      margin: `${strokeWidth}px`
+                      width: `${7 * scaleFactor}rem`,
+                      height: `${7 * scaleFactor}rem`
                     }}
                   >
                   {topicImage ? (
