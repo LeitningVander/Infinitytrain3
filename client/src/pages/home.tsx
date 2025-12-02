@@ -110,7 +110,7 @@ export default function Home() {
                   <DialogTrigger asChild>
                     <Button 
                       size="icon" 
-                      className="rounded-full h-12 w-12 shadow-lg bg-primary hover:bg-primary/90" 
+                      className="rounded-full h-12 w-12 shadow-lg bg-primary hover:bg-[#7acc00]" 
                       onClick={() => handleOpenDialog()}
                       title="Add New Module"
                     >
@@ -167,7 +167,7 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="flex justify-end gap-2">
-                      <Button onClick={handleSubmit} className="bg-black text-white hover:bg-gray-800">Save Module</Button>
+                      <Button onClick={handleSubmit} className="bg-black text-white hover:bg-[#7acc00]">Save Module</Button>
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -215,7 +215,7 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="flex justify-end gap-2">
-                      <Button onClick={handleAddSubtopic} className="bg-black text-white hover:bg-gray-800">Add Subtopic</Button>
+                      <Button onClick={handleAddSubtopic} className="bg-black text-white hover:bg-[#7acc00]">Add Subtopic</Button>
                     </div>
                   </DialogContent>
                 </Dialog>

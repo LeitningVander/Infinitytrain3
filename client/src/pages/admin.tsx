@@ -161,7 +161,7 @@ export default function AdminDashboard() {
             <CardTitle>Modules Management</CardTitle>
             <Dialog open={isAddModuleOpen} onOpenChange={setIsAddModuleOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" className="gap-2 bg-black hover:bg-gray-800 text-white">
+                <Button size="sm" className="gap-2 bg-black hover:bg-[#7acc00] text-white">
                   <Plus className="w-4 h-4" /> Add Module
                 </Button>
               </DialogTrigger>
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <div className="flex justify-end gap-2">
-                  <Button onClick={handleAddModule} className="bg-black text-white hover:bg-gray-800">Add Module</Button>
+                  <Button onClick={handleAddModule} className="bg-black text-white hover:bg-[#7acc00]">Add Module</Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -268,7 +268,7 @@ export default function AdminDashboard() {
                               </div>
                             </div>
                             <div className="flex justify-end gap-2">
-                              <Button onClick={handleAddSubtopic} className="bg-black text-white hover:bg-gray-800">Add Subtopic</Button>
+                              <Button onClick={handleAddSubtopic} className="bg-black text-white hover:bg-[#7acc00]">Add Subtopic</Button>
                             </div>
                           </DialogContent>
                         </Dialog>

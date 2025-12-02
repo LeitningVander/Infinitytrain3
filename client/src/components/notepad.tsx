@@ -469,7 +469,7 @@ export function Notepad({ title, content, onClose, mode, onSubmit }: NotepadProp
             <Button variant="outline" onClick={onClose} className="text-xs">
               Cancel
             </Button>
-            <Button onClick={handleSubmit} className="gap-2 bg-black text-white hover:bg-gray-800 text-xs">
+            <Button onClick={handleSubmit} className="gap-2 bg-black text-white hover:bg-[#7acc00] text-xs">
               <Save className="w-4 h-4" /> Save Note
             </Button>
           </div>

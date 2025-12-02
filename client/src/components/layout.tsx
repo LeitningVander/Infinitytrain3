@@ -64,11 +64,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Center Navigation - Hidden on mobile */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium absolute left-1/2 transform -translate-x-1/2">
-            <Link href="/" className={cn("transition-colors hover:text-white/80", location === '/' ? "text-white font-semibold" : "text-white/70")}>
+            <Link href="/" className={cn("transition-colors", location === '/' ? "text-white font-semibold" : "text-white/70 hover:text-[#7acc00]")}>
               Training Modules
             </Link>
             {currentUser.role === 'admin' && (
-              <Link href="/admin" className={cn("transition-colors hover:text-white/80", location === '/admin' ? "text-white font-semibold" : "text-white/70")}>
+              <Link href="/admin" className={cn("transition-colors", location === '/admin' ? "text-white font-semibold" : "text-white/70 hover:text-[#7acc00]")}>
                 Admin Panel
               </Link>
             )}

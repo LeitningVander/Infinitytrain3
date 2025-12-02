@@ -38,7 +38,7 @@ export default function TopicView() {
       <div className="max-w-4xl mx-auto space-y-8">
         <Button 
           variant="ghost" 
-          className="gap-2 pl-0 hover:pl-2 transition-all text-black hover:text-black/80" 
+          className="gap-2 pl-0 hover:pl-2 transition-all text-black hover:text-[#7acc00]" 
           onClick={() => setLocation('/')}
         >
           <ArrowLeft className="w-4 h-4" /> Back to Modules
