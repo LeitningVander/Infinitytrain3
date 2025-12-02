@@ -29,6 +29,7 @@ export interface Subtopic {
   id: string;
   title: string;
   resources: string;
+  resourceLinks?: any[];
   comments: Comment[];
 }
 
@@ -103,6 +104,7 @@ export class SQLiteStorage implements IStorage {
         topicId TEXT NOT NULL,
         title TEXT NOT NULL,
         resources TEXT NOT NULL,
+        resourceLinks TEXT,
         FOREIGN KEY (topicId) REFERENCES topics(id) ON DELETE CASCADE
       );
 
@@ -265,6 +267,7 @@ export class SQLiteStorage implements IStorage {
           id: subtopic.id,
           title: subtopic.title,
           resources: subtopic.resources,
+          resourceLinks: subtopic.resourceLinks ? JSON.parse(subtopic.resourceLinks) : undefined,
           comments: comments.map(c => ({
             ...c,
             timestamp: new Date(c.timestamp)
@@ -297,13 +300,14 @@ export class SQLiteStorage implements IStorage {
 
     // Insert new subtopics
     const insertSubtopic = this.db.prepare(`
-      INSERT INTO subtopics (id, topicId, title, resources) 
-      VALUES (?, ?, ?, ?)
+      INSERT INTO subtopics (id, topicId, title, resources, resourceLinks) 
+      VALUES (?, ?, ?, ?, ?)
     `);
 
     for (const subtopic of topic.subtopics) {
       const subtopicId = subtopic.id || randomUUID();
-      insertSubtopic.run(subtopicId, topicId, subtopic.title, subtopic.resources);
+      const resourceLinksJson = subtopic.resourceLinks ? JSON.stringify(subtopic.resourceLinks) : null;
+      insertSubtopic.run(subtopicId, topicId, subtopic.title, subtopic.resources, resourceLinksJson);
 
       // Insert comments for this subtopic
       const insertComment = this.db.prepare(`

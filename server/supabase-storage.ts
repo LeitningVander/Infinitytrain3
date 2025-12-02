@@ -22,6 +22,7 @@ export interface Subtopic {
   id: string;
   title: string;
   resources: string;
+  resourceLinks?: any[];
   comments: Comment[];
 }
 
@@ -179,6 +180,7 @@ export class SupabaseStorage implements IStorage {
           id: subtopic.id,
           title: subtopic.title,
           resources: subtopic.resources,
+          resourceLinks: subtopic.resource_links ? JSON.parse(subtopic.resource_links) : undefined,
           comments: (comments || []).map(c => ({
             ...c,
             userId: c.user_id,
@@ -222,13 +224,15 @@ export class SupabaseStorage implements IStorage {
     // Insert new subtopics
     for (const subtopic of topic.subtopics) {
       const subtopicId = subtopic.id || randomUUID();
+      const resourceLinksJson = subtopic.resourceLinks ? JSON.stringify(subtopic.resourceLinks) : null;
       await this.supabase
         .from('subtopics')
         .insert({
           id: subtopicId,
           topic_id: topicId,
           title: subtopic.title,
-          resources: subtopic.resources
+          resources: subtopic.resources,
+          resource_links: resourceLinksJson
         });
 
       // Insert comments
