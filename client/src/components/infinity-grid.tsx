@@ -16,6 +16,28 @@ interface Position {
   zIndex?: number;
 }
 
+// Helper function to get image path for a topic
+const getTopicImagePath = (title: string): string | null => {
+  const imageMap: Record<string, string> = {
+    'mbes': '/images/topics/mbes.jpg',
+    'vc': '/images/topics/svc.png',
+    'qinsy': '/images/topics/qinsy.png',
+    'apos': '/images/topics/apos.png',
+    'naviscan': '/images/topics/naviscan.jpg',
+    'sss': '/images/topics/sss.png',
+    'svp': '/images/topics/svp.png',
+    'cpt': '/images/topics/cpt.png',
+    'subc dvr': '/images/topics/subc dvr.png',
+    'online log': '/images/topics/onlinelog_autolog.png',
+    'auto log': '/images/topics/onlinelog_autolog.png',
+    'helmsman': '/images/topics/helmsman_touchpad.png',
+    'touchpad': '/images/topics/helmsman_touchpad.png',
+  };
+  
+  const normalizedTitle = title.toLowerCase().trim();
+  return imageMap[normalizedTitle] || null;
+};
+
 export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
   const { progress, currentUser } = useTraining();
   
@@ -96,6 +118,7 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-16 place-items-center">
         {activeTopics.map((topic, index) => {
           const IconComponent = (LucideIcons as any)[topic.icon] || LucideIcons.HelpCircle;
+          const topicImage = getTopicImagePath(topic.title);
 
           return (
             <div 
@@ -105,26 +128,37 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
               <Link href={`/topic/${topic.id}`}>
                 <div
                   className={cn(
-                    "flex flex-col items-center justify-center cursor-pointer group relative",
-                    "rounded-full",
+                    "flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden",
+                    topicImage ? "rounded-3xl" : "rounded-full",
                     "shadow-lg hover:shadow-xl border-4 border-white transition-all duration-300",
                     "hover:scale-110 hover:border-primary"
                   )}
                   style={{
-                     background: getPieChartBackground(topic),
+                     background: topicImage ? 'transparent' : getPieChartBackground(topic),
                      width: `${7 * scaleFactor}rem`,
                      height: `${7 * scaleFactor}rem`
                   }}
                 >
-                  <div className="p-3 rounded-full bg-white/80 group-hover:bg-white/90 transition-colors backdrop-blur-sm">
-                    <IconComponent 
-                      className="text-primary group-hover:text-secondary transition-colors" 
-                      style={{
-                        width: `${2.2 * scaleFactor}rem`,
-                        height: `${2.2 * scaleFactor}rem`
-                      }}
-                    />
-                  </div>
+                  {topicImage ? (
+                    <div className="relative w-full h-full">
+                      <img 
+                        src={topicImage} 
+                        alt={topic.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+                    </div>
+                  ) : (
+                    <div className="p-3 rounded-full bg-white/80 group-hover:bg-white/90 transition-colors backdrop-blur-sm">
+                      <IconComponent 
+                        className="text-primary group-hover:text-secondary transition-colors" 
+                        style={{
+                          width: `${2.2 * scaleFactor}rem`,
+                          height: `${2.2 * scaleFactor}rem`
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </Link>
               
