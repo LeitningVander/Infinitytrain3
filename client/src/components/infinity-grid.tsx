@@ -168,28 +168,7 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
             >
               <Link href={`/topic/${topic.id}`}>
                 <div className="relative inline-block">
-                  {/* Progress border using CSS */}
-                  <div 
-                    className={cn(
-                      "absolute inset-0 pointer-events-none",
-                      topicImage ? "rounded-3xl" : "rounded-full"
-                    )}
-                    style={{
-                      background: `conic-gradient(from 0deg, #7acc00 0deg ${progressPercent * 3.6}deg, #FFFFFF ${progressPercent * 3.6}deg 360deg)`,
-                      WebkitMask: topicImage 
-                        ? `linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)`
-                        : `radial-gradient(farthest-side, transparent calc(100% - ${strokeWidth}px), #fff calc(100% - ${strokeWidth}px))`,
-                      WebkitMaskComposite: 'xor',
-                      maskComposite: 'exclude',
-                      mask: topicImage
-                        ? `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`
-                        : undefined,
-                      padding: `${strokeWidth}px`,
-                      transition: 'background 0.5s ease'
-                    }}
-                  />
-                  
-                  {/* Topic Content */}
+                  {/* Topic Content with integrated progress border */}
                   <div
                     className={cn(
                       "flex flex-col items-center justify-center cursor-pointer relative overflow-hidden",
@@ -201,7 +180,14 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
                       background: topicImage ? 'transparent' : getPieChartBackground(topic),
                       width: `${containerSize}rem`,
                       height: `${containerSize}rem`,
-                      margin: `${strokeWidth}px`
+                      border: `${strokeWidth}px solid transparent`,
+                      backgroundImage: `
+                        conic-gradient(from 0deg, #7acc00 0deg ${progressPercent * 3.6}deg, #FFFFFF ${progressPercent * 3.6}deg 360deg),
+                        ${topicImage ? 'none' : `conic-gradient(${getPieChartBackground(topic)})`}
+                      `,
+                      backgroundOrigin: 'border-box',
+                      backgroundClip: topicImage ? 'border-box' : 'padding-box, border-box',
+                      transition: 'background 0.5s ease, transform 0.3s ease'
                     }}
                   >
                   {topicImage ? (
