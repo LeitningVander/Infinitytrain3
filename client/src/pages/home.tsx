@@ -109,12 +109,12 @@ export default function Home() {
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
-                      size="icon" 
-                      className="rounded-full h-12 w-12 shadow-lg bg-primary hover:bg-[#7acc00]" 
+                      className="shadow-lg bg-[#006400] hover:bg-[#7acc00] text-white gap-2 px-4" 
                       onClick={() => handleOpenDialog()}
                       title="Add New Module"
                     >
-                      <Plus className="h-6 w-6 text-white" />
+                      <Plus className="h-5 w-5" />
+                      Add Module
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px] bg-white text-black border-none shadow-2xl">
@@ -176,11 +176,11 @@ export default function Home() {
                 <Dialog open={isSubtopicDialogOpen} onOpenChange={setIsSubtopicDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
-                      size="icon" 
-                      className="rounded-full h-12 w-12 shadow-lg bg-yellow-400 hover:bg-yellow-500"
+                      className="shadow-lg bg-[#006400] hover:bg-[#7acc00] text-white gap-2 px-4"
                       title="Add New Subtopic"
                     >
-                      <Plus className="h-6 w-6 text-black" />
+                      <Plus className="h-5 w-5" />
+                      Add Subtopic
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px] bg-white text-black border-none shadow-2xl">
