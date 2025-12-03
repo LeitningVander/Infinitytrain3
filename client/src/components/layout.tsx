@@ -50,16 +50,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="sticky top-0 z-40 w-full border-b shadow-sm" style={{ background: 'linear-gradient(to right, #001f3f, #005A9E)' }}>
         <div className="w-full flex h-16 items-center justify-between px-4 md:px-6">
-          {/* Profile Picture Top-Left */}
+          {/* Left Side - Empty or Logo placeholder */}
           <div className="flex items-center gap-3">
-            <img src={displayUser.avatar} alt={displayUser.name} className="h-10 w-10 rounded-full ring-2 ring-primary/20" />
-            <div className="flex flex-col">
-              <p className="font-medium leading-none text-sm text-white">
-                {displayUser.name}
-                {viewAsUser && <span className="text-xs text-white/80 ml-2">(viewing)</span>}
-              </p>
-              <p className="text-xs text-white/80 capitalize">{displayUser.role}</p>
-            </div>
+            {/* Reserved for logo or other left-aligned content */}
           </div>
 
           {/* Center Navigation - Hidden on mobile */}
@@ -74,8 +67,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
             )}
           </nav>
 
-          {/* Right Side Buttons */}
+          {/* Right Side - User Profile and Action Buttons */}
           <div className="flex items-center gap-2">
+            {/* User Profile */}
+            <div className="flex items-center gap-3">
+              <img src={displayUser.avatar} alt={displayUser.name} className="h-10 w-10 rounded-full ring-2 ring-primary/20" />
+              <div className="hidden sm:flex flex-col">
+                <p className="font-medium leading-none text-sm text-white">
+                  {displayUser.name}
+                  {viewAsUser && <span className="text-xs text-white/80 ml-2">(viewing)</span>}
+                </p>
+                <p className="text-xs text-white/80 capitalize">{displayUser.role}</p>
+              </div>
+            </div>
+            
+            <div className="h-8 w-px bg-white/20 mx-1" />
             {currentUser.role === 'admin' && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
