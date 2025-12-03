@@ -69,13 +69,55 @@ interface TrainingContextType {
 
 const TrainingContext = createContext<TrainingContextType | undefined>(undefined);
 
+const STORAGE_KEYS = {
+  CURRENT_USER: 'training_current_user',
+  VIEW_AS_USER: 'training_view_as_user'
+};
+
 export function TrainingProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [viewAsUser, setViewAsUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    // Initialize from sessionStorage on mount
+    try {
+      const stored = sessionStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+  
+  const [viewAsUser, setViewAsUser] = useState<User | null>(() => {
+    // Initialize from sessionStorage on mount
+    try {
+      const stored = sessionStorage.getItem(STORAGE_KEYS.VIEW_AS_USER);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+  
   const [users, setUsers] = useState<User[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Persist currentUser to sessionStorage whenever it changes
+  useEffect(() => {
+    if (currentUser) {
+      sessionStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(currentUser));
+    } else {
+      sessionStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+      sessionStorage.removeItem(STORAGE_KEYS.VIEW_AS_USER);
+    }
+  }, [currentUser]);
+
+  // Persist viewAsUser to sessionStorage whenever it changes
+  useEffect(() => {
+    if (viewAsUser) {
+      sessionStorage.setItem(STORAGE_KEYS.VIEW_AS_USER, JSON.stringify(viewAsUser));
+    } else {
+      sessionStorage.removeItem(STORAGE_KEYS.VIEW_AS_USER);
+    }
+  }, [viewAsUser]);
 
   // Load initial data only after user logs in
   useEffect(() => {
