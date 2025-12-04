@@ -17,16 +17,7 @@ export default function AdminDashboard() {
   const { topics, users, progress, addTopic, updateTopic } = useTraining();
   
   // Dialogs & State
-  const [isAddModuleOpen, setIsAddModuleOpen] = useState(false);
-  const [isAddSubtopicOpen, setIsAddSubtopicOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  
-  const [newModuleTitle, setNewModuleTitle] = useState('');
-  const [newModuleIcon, setNewModuleIcon] = useState('HelpCircle');
-  
-  const [newSubtopicTitle, setNewSubtopicTitle] = useState('');
-  const [selectedModuleForSubtopic, setSelectedModuleForSubtopic] = useState<string>('');
-  
   const [selectedModuleForDetail, setSelectedModuleForDetail] = useState<Topic | null>(null);
   const [selectedEmployeeForDetail, setSelectedEmployeeForDetail] = useState<string | null>(null);
   const [isEmployeeDetailOpen, setIsEmployeeDetailOpen] = useState(false);
@@ -84,40 +75,7 @@ export default function AdminDashboard() {
     });
     setNewModuleTitle('');
     setNewModuleIcon('HelpCircle');
-    setIsAddModuleOpen(false);
-  };
-
-  const handleAddSubtopic = () => {
-    if (!selectedModuleForSubtopic || !newSubtopicTitle.trim()) return;
-    
-    const topicToUpdate = activeTopics.find(t => t.id === selectedModuleForSubtopic);
-    if (topicToUpdate) {
-      const newSubtopic: Subtopic = {
-        id: Math.random().toString(36).substr(2, 9),
-        title: newSubtopicTitle,
-        resources: `# ${newSubtopicTitle}\n\nResources for ${newSubtopicTitle}...`,
-        comments: []
-      };
-      updateTopic({
-        ...topicToUpdate,
-        subtopics: [...topicToUpdate.subtopics, newSubtopic]
-      });
-      setNewSubtopicTitle('');
-      setSelectedModuleForSubtopic('');
-      setIsAddSubtopicOpen(false);
-    }
-  };
-
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'fully_understood':
-        return 'bg-green-100 text-green-800';
-      case 'good':
-        return 'bg-blue-100 text-blue-800';
-      case 'basic':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'not_addressed':
-        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -188,65 +146,11 @@ export default function AdminDashboard() {
                       <SelectContent className="h-64 bg-white text-black border-gray-200">
                         {[
                           'Anchor', 'Ship', 'Navigation', 'Compass', 'Map', 'MapPin', 'Globe', 'Waves', 'Wind', 'CloudRain', 
-                          'Droplets', 'Fish', 'Target', 'Crosshair', 'Radar', 'Scan', 'Sonar', 'Search', 'Locate', 'Satellite',
-                          'Radio', 'Signal', 'Wifi', 'Server', 'Database', 'HardDrive', 'Cpu', 'Activity', 'BarChart', 'BarChart2',
-                          'LineChart', 'PieChart', 'TrendingUp', 'Ruler', 'Triangle', 'Square', 'Circle', 'Hexagon', 'Layers', 'Box',
-                          'Package', 'Container', 'Truck', 'Sailboat', 'Thermometer', 'Sun', 'Moon', 'Sunrise', 'Sunset', 'Eye',
-                          'Briefcase', 'Building', 'Building2', 'Users', 'UserCheck', 'UserPlus', 'UserCog', 'User', 'File', 'FileText',
-                          'FileCheck', 'FilePlus', 'Folder', 'FolderOpen', 'FolderPlus', 'Clipboard', 'ClipboardCheck', 'ClipboardList',
-                          'CheckSquare', 'List', 'Layout', 'Grid', 'Table', 'Calendar', 'Clock', 'Timer', 'Watch', 'AlarmClock',
-                          'Mail', 'MessageSquare', 'MessageCircle', 'Phone', 'Smartphone', 'Monitor', 'Laptop', 'Tablet', 'Printer',
-                          'Settings', 'Sliders', 'Filter', 'Search', 'ZoomIn', 'ZoomOut', 'HelpCircle', 'Info', 'AlertCircle', 'AlertTriangle',
-                          'Shield', 'ShieldCheck', 'Lock', 'Unlock', 'Key', 'CreditCard', 'DollarSign', 'Euro', 'Pound', 'Bitcoin',
-                          'Award', 'Medal', 'Star', 'Heart', 'ThumbsUp', 'ThumbsDown', 'Zap', 'Power', 'Battery', 'Plug'
-                        ].map(name => (
-                          <SelectItem key={name} value={name} className="text-black">
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button onClick={handleAddModule} className="bg-black text-white hover:bg-[#7acc00]">Add Module</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {activeTopics.map((topic) => {
-                const { overallPercentage, details } = getModuleProgressStats(topic.id);
-                
-                return (
-                  <div key={topic.id} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {React.createElement((LucideIcons as any)[topic.icon] || LucideIcons.HelpCircle, {
-                          className: 'w-5 h-5 text-primary'
-                        })}
-                        <div>
-                          <h3 className="font-semibold text-black">{topic.title}</h3>
-                          <p className="text-sm text-muted-foreground">{topic.subtopics.length} subtopics</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="text-right">
-                          <div className="text-lg font-bold text-primary">{overallPercentage}%</div>
-                          <p className="text-xs text-muted-foreground">Overall Progress</p>
-                        </div>
-                        <Dialog open={isAddSubtopicOpen && selectedModuleForSubtopic === topic.id} onOpenChange={(open) => {
-                          if (!open) {
-                            setSelectedModuleForSubtopic('');
-                          }
-                          setIsAddSubtopicOpen(open);
-                        }}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => setSelectedModuleForSubtopic(topic.id)}
+        {/* Modules Management */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Modules Overview</CardTitle>
+          </CardHeader>       onClick={() => setSelectedModuleForSubtopic(topic.id)}
                             >
                               <Plus className="w-4 h-4 mr-1" /> Subtopic
                             </Button>
