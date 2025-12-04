@@ -18,6 +18,7 @@ export default function AdminDashboard() {
   
   // Dialogs & State
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  
   const [selectedModuleForDetail, setSelectedModuleForDetail] = useState<Topic | null>(null);
   const [selectedEmployeeForDetail, setSelectedEmployeeForDetail] = useState<string | null>(null);
   const [isEmployeeDetailOpen, setIsEmployeeDetailOpen] = useState(false);
@@ -66,7 +67,6 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleAddModule = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'fully_understood':
@@ -116,67 +116,29 @@ export default function AdminDashboard() {
 
         {/* Modules Management */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle>Modules Management</CardTitle>
-            <Dialog open={isAddModuleOpen} onOpenChange={setIsAddModuleOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-2 bg-black hover:bg-[#7acc00] text-white">
-                  <Plus className="w-4 h-4" /> Add Module
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-white text-black border-none shadow-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-black">Add New Module</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="module-title" className="text-right text-black">Title</Label>
-                    <Input 
-                      id="module-title" 
-                      value={newModuleTitle} 
-                      onChange={(e) => setNewModuleTitle(e.target.value)} 
-                      className="col-span-3 bg-white text-black border-gray-200" 
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="module-icon" className="text-right text-black">Icon</Label>
-                    <Select value={newModuleIcon} onValueChange={setNewModuleIcon}>
-                      <SelectTrigger className="col-span-3 bg-white text-black border-gray-200">
-                        <SelectValue placeholder="Select icon" />
-                      </SelectTrigger>
-                      <SelectContent className="h-64 bg-white text-black border-gray-200">
-                        {[
-                          'Anchor', 'Ship', 'Navigation', 'Compass', 'Map', 'MapPin', 'Globe', 'Waves', 'Wind', 'CloudRain', 
-        {/* Modules Management */}
-        <Card>
           <CardHeader>
             <CardTitle>Modules Overview</CardTitle>
-          </CardHeader>       onClick={() => setSelectedModuleForSubtopic(topic.id)}
-                            >
-                              <Plus className="w-4 h-4 mr-1" /> Subtopic
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-white text-black border-none shadow-2xl">
-                            <DialogHeader>
-                              <DialogTitle className="text-black">Add Subtopic to {topic.title}</DialogTitle>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="subtopic-title" className="text-right text-black">Title</Label>
-                                <Input 
-                                  id="subtopic-title" 
-                                  value={newSubtopicTitle} 
-                                  onChange={(e) => setNewSubtopicTitle(e.target.value)} 
-                                  className="col-span-3 bg-white text-black border-gray-200" 
-                                  placeholder="Subtopic Title"
-                                />
-                              </div>
-                            </div>
-                            <div className="flex justify-end gap-2">
-                              <Button onClick={handleAddSubtopic} className="bg-black text-white hover:bg-[#7acc00]">Add Subtopic</Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {activeTopics.map((topic) => {
+                const { overallPercentage, details } = getModuleProgressStats(topic.id);
+                
+                return (
+                  <div key={topic.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {React.createElement((LucideIcons as any)[topic.icon] || LucideIcons.HelpCircle, {
+                          className: 'w-5 h-5 text-primary'
+                        })}
+                        <div>
+                          <h3 className="font-semibold text-black">{topic.title}</h3>
+                          <p className="text-sm text-muted-foreground">{topic.subtopics.length} subtopics</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-primary">{overallPercentage}%</div>
+                        <p className="text-xs text-muted-foreground">Overall Progress</p>
                       </div>
                     </div>
 
