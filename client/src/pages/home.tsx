@@ -71,15 +71,16 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-heading font-bold tracking-tight text-white">
             Training Modules
           </h1>
-          <div className="relative flex items-center justify-center">
+          <div className="relative">
             <p className="text-lg text-white">
               Select a module from the infinity path below to begin your learning journey.
             </p>
             {currentUser?.role === 'admin' && (
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <div className="absolute top-0 left-full ml-4">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
-                      className="shadow-lg bg-[#006400] hover:bg-[#7acc00] text-white gap-2 px-4 absolute right-0 translate-x-full ml-4" 
+                      className="shadow-lg bg-[#006400] hover:bg-[#7acc00] text-white gap-2 px-4 whitespace-nowrap" 
                       onClick={() => handleOpenDialog()}
                       title="Add New Module"
                     >
@@ -141,6 +142,7 @@ export default function Home() {
                     </div>
                   </DialogContent>
                 </Dialog>
+              </div>
             )}
           </div>
         </div>
