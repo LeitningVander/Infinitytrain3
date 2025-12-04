@@ -32,6 +32,8 @@ const getTopicImagePath = (title: string): string | null => {
     'cpt': '/images/topics/cpt.png',
     'subc dvr': '/images/topics/subc dvr.png',
     'gnss': '/images/topics/gnss.webp',
+    'tss440': '/images/topics/tss440.webp',
+    'obs': '/images/topics/obs.png',
   };
   
   // Check direct mapping first
