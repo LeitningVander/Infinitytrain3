@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useTraining, type User } from '@/lib/store';
 import { 
@@ -7,10 +7,19 @@ import {
   LogOut, 
   Menu,
   Infinity,
-  Check
+  Check,
+  Upload,
+  Camera
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,11 +28,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
+import { uploadProfilePicture, isSupabaseConfigured } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { currentUser, viewAsUser, setCurrentUser, setViewAsUser, users } = useTraining();
   const [location, setLocation] = useLocation();
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleLogout = () => {
     setCurrentUser(null);
@@ -34,6 +51,93 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const handleViewAsUser = (user: User) => {
     if (currentUser?.role !== 'admin') return;
     setViewAsUser(user.id === currentUser.id ? null : user);
+  };
+
+  const handleAvatarClick = () => {
+    // Only allow the actual logged-in user to upload, not when viewing as another user
+    if (!viewAsUser && isSupabaseConfigured()) {
+      setIsUploadDialogOpen(true);
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select a JPG, PNG, or WebP image.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (500 KB)
+    if (file.size > 512000) {
+      toast({
+        title: "File too large",
+        description: "Please select an image under 500 KB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile || !currentUser) return;
+
+    setIsUploading(true);
+    try {
+      // Upload to Supabase
+      const publicUrl = await uploadProfilePicture(currentUser.id, selectedFile);
+      
+      if (!publicUrl) {
+        throw new Error('Failed to get public URL');
+      }
+
+      // Update user in database
+      const response = await fetch(`/api/users/${currentUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar: publicUrl })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user');
+      }
+
+      const updatedUser = await response.json();
+      setCurrentUser(updatedUser);
+
+      toast({
+        title: "Success!",
+        description: "Profile picture updated successfully.",
+      });
+
+      // Reset dialog
+      setIsUploadDialogOpen(false);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to upload profile picture.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   if (!currentUser) return null;
@@ -71,7 +175,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             {/* User Profile */}
             <div className="flex items-center gap-3">
-              <img src={displayUser.avatar} alt={displayUser.name} className="h-10 w-10 rounded-full ring-2 ring-primary/20" />
+              <div className="relative group">
+                <img 
+                  src={displayUser.avatar} 
+                  alt={displayUser.name} 
+                  className={cn(
+                    "h-10 w-10 rounded-full ring-2 ring-primary/20",
+                    !viewAsUser && isSupabaseConfigured() && "cursor-pointer hover:ring-4 hover:ring-[#7acc00] transition-all"
+                  )}
+                  onClick={handleAvatarClick}
+                />
+                {!viewAsUser && isSupabaseConfigured() && (
+                  <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                    onClick={handleAvatarClick}
+                  >
+                    <Camera className="h-5 w-5 text-white" />
+                  </div>
+                )}
+              </div>
               <div className="hidden sm:flex flex-col">
                 <p className="font-medium leading-none text-sm text-white">
                   {displayUser.name}
@@ -146,6 +267,72 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 w-full max-w-7xl mx-auto py-8 px-4 md:px-6">
         {children}
       </main>
+
+      {/* Profile Picture Upload Dialog */}
+      <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle>Update Profile Picture</DialogTitle>
+            <DialogDescription>
+              Upload a new profile picture (JPG, PNG, or WebP, max 500 KB)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex flex-col items-center gap-4">
+              {previewUrl ? (
+                <img 
+                  src={previewUrl} 
+                  alt="Preview" 
+                  className="w-32 h-32 rounded-full object-cover border-4 border-primary/20"
+                />
+              ) : (
+                <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border-4 border-primary/20">
+                  <Camera className="h-12 w-12 text-gray-400" />
+                </div>
+              )}
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Select Image
+              </Button>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsUploadDialogOpen(false);
+                  setSelectedFile(null);
+                  setPreviewUrl(null);
+                }}
+                disabled={isUploading}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpload}
+                disabled={!selectedFile || isUploading}
+                className="bg-[#006400] hover:bg-[#7acc00]"
+              >
+                {isUploading ? 'Uploading...' : 'Upload'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

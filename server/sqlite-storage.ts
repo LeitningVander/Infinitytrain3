@@ -407,6 +407,41 @@ export class SQLiteStorage implements IStorage {
     return user;
   }
 
+  async updateUser(userId: string, updates: Partial<User>): Promise<User | undefined> {
+    const user = await this.getUser(userId);
+    if (!user) return undefined;
+
+    const fields = [];
+    const values = [];
+
+    if (updates.name !== undefined) {
+      fields.push('name = ?');
+      values.push(updates.name);
+    }
+    if (updates.email !== undefined) {
+      fields.push('email = ?');
+      values.push(updates.email);
+    }
+    if (updates.role !== undefined) {
+      fields.push('role = ?');
+      values.push(updates.role);
+    }
+    if (updates.avatar !== undefined) {
+      fields.push('avatar = ?');
+      values.push(updates.avatar);
+    }
+
+    if (fields.length === 0) return user;
+
+    values.push(userId);
+
+    this.db.prepare(`
+      UPDATE users SET ${fields.join(', ')} WHERE id = ?
+    `).run(...values);
+
+    return this.getUser(userId);
+  }
+
   close() {
     this.db.close();
   }

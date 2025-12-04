@@ -102,6 +102,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user (e.g., avatar)
+  app.patch("/api/users/:id", async (req, res) => {
+    try {
+      const updates = req.body;
+      const user = await storage.updateUser(req.params.id, updates);
+      if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return;
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
   // Login API - authenticate by email
   app.post("/api/login", async (req, res) => {
     try {

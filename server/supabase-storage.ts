@@ -52,6 +52,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: User): Promise<User>;
+  updateUser(userId: string, updates: Partial<User>): Promise<User | undefined>;
   initialize(): Promise<void>;
 }
 
@@ -346,5 +347,20 @@ export class SupabaseStorage implements IStorage {
       .from('users')
       .insert(user);
     return user;
+  }
+
+  async updateUser(userId: string, updates: Partial<User>): Promise<User | undefined> {
+    const { data, error } = await this.supabase
+      .from('users')
+      .update(updates)
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating user:', error);
+      return undefined;
+    }
+    return data as User;
   }
 }
