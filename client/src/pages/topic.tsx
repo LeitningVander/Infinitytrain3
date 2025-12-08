@@ -11,13 +11,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, BookOpen, MessageSquare, CheckCircle2, Settings, GripVertical, Plus } from 'lucide-react';
+import { ArrowLeft, BookOpen, MessageSquare, CheckCircle2, Settings, GripVertical, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function TopicView() {
   const [, params] = useRoute('/topic/:id');
   const [, setLocation] = useLocation();
-  const { topics, progress, updateProgress, addComment, currentUser, viewAsUser, updateSubtopicResources, updateTopic } = useTraining();
+  const { topics, progress, updateProgress, addComment, currentUser, viewAsUser, updateSubtopicResources, updateTopic, deleteSubtopic } = useTraining();
   const [activeResource, setActiveResource] = useState<string | null>(null);
   const [activeComments, setActiveComments] = useState<string | null>(null);
   const [manageResourcesFor, setManageResourcesFor] = useState<string | null>(null);
@@ -78,6 +78,12 @@ export default function TopicView() {
     
     setIsAddSubtopicOpen(false);
     setNewSubtopicTitle('');
+  };
+
+  const handleDeleteSubtopic = (subtopicId: string) => {
+    if (confirm('Are you sure you want to delete this subtopic? This action cannot be undone.')) {
+      deleteSubtopic(topic.id, subtopicId);
+    }
   };
 
   const getStatus = (subtopicId: string) => {
@@ -142,7 +148,19 @@ export default function TopicView() {
                     </div>
                   )}
                   <div className="space-y-2 flex-1">
-                    <h3 className="text-xl font-semibold">{subtopic.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xl font-semibold">{subtopic.title}</h3>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-red-600 hover:bg-red-50"
+                          onClick={() => handleDeleteSubtopic(subtopic.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                     <div className="flex gap-2 flex-wrap">
                       <Button 
                         variant="outline" 

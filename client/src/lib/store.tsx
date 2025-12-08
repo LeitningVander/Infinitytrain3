@@ -65,6 +65,7 @@ interface TrainingContextType {
   archiveTopic: (topicId: string) => void;
   restoreTopic: (topicId: string) => void;
   updateSubtopicResources: (topicId: string, subtopicId: string, resources: Resource[]) => void;
+  deleteSubtopic: (topicId: string, subtopicId: string) => void;
 }
 
 const TrainingContext = createContext<TrainingContextType | undefined>(undefined);
@@ -339,6 +340,32 @@ export function TrainingProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const deleteSubtopic = (topicId: string, subtopicId: string) => {
+    setTopics(prev => prev.map(topic => {
+      if (topic.id === topicId) {
+        return {
+          ...topic,
+          subtopics: topic.subtopics.filter(subtopic => subtopic.id !== subtopicId)
+        };
+      }
+      return topic;
+    }));
+
+    // Save to backend
+    const updatedTopic = topics.find(t => t.id === topicId);
+    if (updatedTopic) {
+      const updated = {
+        ...updatedTopic,
+        subtopics: updatedTopic.subtopics.filter(subtopic => subtopic.id !== subtopicId)
+      };
+      fetch(`/api/topics/${topicId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      }).catch(err => console.error('Failed to delete subtopic:', err));
+    }
+  };
+
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
@@ -347,7 +374,7 @@ export function TrainingProvider({ children }: { children: React.ReactNode }) {
     <TrainingContext.Provider value={{ 
       currentUser, viewAsUser, users, topics, progress, 
       setCurrentUser, setViewAsUser, updateProgress, addComment, addTopic, updateTopic,
-      archiveTopic, restoreTopic, updateSubtopicResources
+      archiveTopic, restoreTopic, updateSubtopicResources, deleteSubtopic
     }}>
       {children}
     </TrainingContext.Provider>
