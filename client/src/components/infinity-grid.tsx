@@ -78,119 +78,27 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
   
   const scaleFactor = getScaleFactor(activeTopics.length);
 
-  // Calculate progress percentage for a topic
-  const calculateTopicProgress = (topic: Topic): number => {
-    if (!topic.subtopics.length) return 0;
-
-    const subtopicIds = topic.subtopics.map(s => s.id);
-    const topicProgress = progress.filter(p => p.userId === displayUser?.id && subtopicIds.includes(p.subtopicId));
-    
-    let totalScore = 0;
-    topic.subtopics.forEach(st => {
-      const p = topicProgress.find(tp => tp.subtopicId === st.id);
-      const status = p?.status || 'not_addressed';
-      
-      // Weight: not_addressed=0, basic=33, good=66, fully_understood=100
-      if (status === 'fully_understood') totalScore += 100;
-      else if (status === 'good') totalScore += 66;
-      else if (status === 'basic') totalScore += 33;
-      // not_addressed adds 0
-    });
-
-    return Math.round(totalScore / topic.subtopics.length);
-  };
-
-  // Helper to get pie chart background (for non-image topics)
-  const getPieChartBackground = (topic: Topic) => {
-    if (!topic.subtopics.length) return 'white'; // No subtopics, just white
+  // Calculate progress counts for a topic (for vertical bar)
+  const getProgressCounts = (topic: Topic) => {
+    if (!topic.subtopics.length) return { not_addressed: 0, basic: 0, good: 0, fully_understood: 0 };
 
     const subtopicIds = topic.subtopics.map(s => s.id);
     const topicProgress = progress.filter(p => p.userId === displayUser?.id && subtopicIds.includes(p.subtopicId));
     
     const counts = {
-      fully_understood: 0,
-      good: 0,
+      not_addressed: 0,
       basic: 0,
-      not_addressed: 0
+      good: 0,
+      fully_understood: 0
     };
 
     topic.subtopics.forEach(st => {
       const p = topicProgress.find(tp => tp.subtopicId === st.id);
       const status = p?.status || 'not_addressed';
-      counts[status === 'fully_understood' ? 'fully_understood' : 
-             status === 'good' ? 'good' : 
-             status === 'basic' ? 'basic' : 'not_addressed']++;
+      counts[status]++;
     });
 
-    const total = topic.subtopics.length;
-    const pFully = (counts.fully_understood / total) * 100;
-    const pGood = (counts.good / total) * 100;
-    const pBasic = (counts.basic / total) * 100;
-    const pNot = (counts.not_addressed / total) * 100;
-
-    // Light colors for pie chart
-    const cFully = '#bbf7d0'; // light green
-    const cGood = '#bfdbfe'; // light blue
-    const cBasic = '#fef08a'; // light yellow
-    const cNot = '#fecaca'; // light red
-
-    // Conic gradient logic
-    // standard order: fully -> good -> basic -> not
-    let currentDeg = 0;
-    const stops = [];
-
-    if (pFully > 0) {
-      stops.push(`${cFully} 0deg ${currentDeg + (pFully * 3.6)}deg`);
-      currentDeg += pFully * 3.6;
-    }
-    if (pGood > 0) {
-      stops.push(`${cGood} ${currentDeg}deg ${currentDeg + (pGood * 3.6)}deg`);
-      currentDeg += pGood * 3.6;
-    }
-    if (pBasic > 0) {
-      stops.push(`${cBasic} ${currentDeg}deg ${currentDeg + (pBasic * 3.6)}deg`);
-      currentDeg += pBasic * 3.6;
-    }
-    if (pNot > 0) {
-      stops.push(`${cNot} ${currentDeg}deg 360deg`);
-    }
-
-    return `conic-gradient(${stops.join(', ')})`;
-  };
-
-  // Helper to get segmented progress border based on subtopic statuses
-  const getProgressBorderGradient = (topic: Topic): string => {
-    if (!topic.subtopics.length) return 'conic-gradient(#e5e7eb 0deg 360deg)'; // Gray for no subtopics
-
-    const subtopicIds = topic.subtopics.map(s => s.id);
-    const topicProgress = progress.filter(p => p.userId === displayUser?.id && subtopicIds.includes(p.subtopicId));
-    
-    // Get status for each subtopic in order
-    const statuses: ProgressStatus[] = topic.subtopics.map(st => {
-      const p = topicProgress.find(tp => tp.subtopicId === st.id);
-      return p?.status || 'not_addressed';
-    });
-
-    // Status colors for the border
-    const statusColors: Record<ProgressStatus, string> = {
-      fully_understood: '#22c55e', // green-500
-      good: '#3b82f6', // blue-500
-      basic: '#eab308', // yellow-500
-      not_addressed: '#cbd5e1' // slate-300
-    };
-
-    const total = statuses.length;
-    const degreePerSegment = 360 / total;
-    
-    const stops: string[] = [];
-    statuses.forEach((status, index) => {
-      const startDeg = index * degreePerSegment;
-      const endDeg = (index + 1) * degreePerSegment;
-      const color = statusColors[status];
-      stops.push(`${color} ${startDeg}deg ${endDeg}deg`);
-    });
-
-    return `conic-gradient(from 0deg, ${stops.join(', ')})`;
+    return counts;
   };
 
   return (
@@ -199,21 +107,58 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
         {activeTopics.map((topic, index) => {
           const IconComponent = (LucideIcons as any)[topic.icon] || LucideIcons.HelpCircle;
           const topicImage = getTopicImagePath(topic.title);
-          const progressBorderGradient = getProgressBorderGradient(topic);
+          const progressCounts = getProgressCounts(topic);
+          const total = topic.subtopics.length;
           
           // Calculate dimensions
           const containerSize = 7 * scaleFactor; // in rem
-          const strokeWidth = 6; // px
-          const borderRadius = 24; // rounded-3xl = 24px
 
           return (
             <div 
               key={topic.id}
-              className="relative group w-fit"
+              className="relative group w-fit flex items-center gap-3"
             >
+              {/* Vertical Progress Bar */}
+              {total > 0 && (
+                <div 
+                  className="flex flex-col h-28 w-2 rounded-full overflow-hidden bg-slate-200 shadow-inner"
+                  style={{ height: `${containerSize}rem` }}
+                >
+                  {/* Stack from bottom: green, blue, yellow, white */}
+                  {progressCounts.fully_understood > 0 && (
+                    <div 
+                      className="bg-green-500 w-full transition-all duration-500"
+                      style={{ height: `${(progressCounts.fully_understood / total) * 100}%` }}
+                      title={`Fully Understood: ${progressCounts.fully_understood}`}
+                    />
+                  )}
+                  {progressCounts.good > 0 && (
+                    <div 
+                      className="bg-blue-500 w-full transition-all duration-500"
+                      style={{ height: `${(progressCounts.good / total) * 100}%` }}
+                      title={`Good Understanding: ${progressCounts.good}`}
+                    />
+                  )}
+                  {progressCounts.basic > 0 && (
+                    <div 
+                      className="bg-yellow-500 w-full transition-all duration-500"
+                      style={{ height: `${(progressCounts.basic / total) * 100}%` }}
+                      title={`Basic Understanding: ${progressCounts.basic}`}
+                    />
+                  )}
+                  {progressCounts.not_addressed > 0 && (
+                    <div 
+                      className="bg-slate-300 w-full transition-all duration-500"
+                      style={{ height: `${(progressCounts.not_addressed / total) * 100}%` }}
+                      title={`Not Addressed: ${progressCounts.not_addressed}`}
+                    />
+                  )}
+                </div>
+              )}
+              
               <Link href={`/topic/${topic.id}`}>
                 <div className="relative inline-block">
-                  {/* Topic Content with integrated progress border */}
+                  {/* Topic Content without progress border */}
                   <div
                     className={cn(
                       "flex flex-col items-center justify-center cursor-pointer relative overflow-hidden",
@@ -222,15 +167,9 @@ export function InfinityGrid({ topics, onEdit }: InfinityGridProps) {
                       "hover:scale-105"
                     )}
                     style={{
-                      background: topicImage ? 'white' : getPieChartBackground(topic),
+                      background: 'white',
                       width: `${containerSize}rem`,
                       height: `${containerSize}rem`,
-                      border: `${strokeWidth}px solid transparent`,
-                      backgroundImage: topicImage 
-                        ? progressBorderGradient
-                        : `${progressBorderGradient}, ${getPieChartBackground(topic)}`,
-                      backgroundOrigin: 'border-box',
-                      backgroundClip: topicImage ? 'border-box' : 'border-box, padding-box',
                       transition: 'background 0.5s ease, transform 0.3s ease'
                     }}
                   >

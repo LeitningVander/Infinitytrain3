@@ -9,7 +9,8 @@ import {
   Infinity,
   Check,
   Upload,
-  Camera
+  Camera,
+  TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -163,6 +164,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/" className={cn("transition-colors", location === '/' ? "text-white font-semibold" : "text-white/70 hover:text-[#7acc00]")}>
               Training Modules
             </Link>
+            <Link href="/progress" className={cn("transition-colors", location === '/progress' ? "text-white font-semibold" : "text-white/70 hover:text-[#7acc00]")}>
+              Progress Overview
+            </Link>
             {currentUser.role === 'admin' && (
               <Link href="/admin" className={cn("transition-colors", location === '/admin' ? "text-white font-semibold" : "text-white/70 hover:text-[#7acc00]")}>
                 Admin Panel
@@ -248,6 +252,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <nav className="flex flex-col gap-4 mt-8">
                     <Link href="/" className="text-lg font-medium hover:text-secondary">
                       Training Modules
+                    </Link>
+                    <Link href="/progress" className="text-lg font-medium hover:text-secondary">
+                      Progress Overview
                     </Link>
                     {currentUser.role === 'admin' && (
                       <Link href="/admin" className="text-lg font-medium hover:text-secondary">

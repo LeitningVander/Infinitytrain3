@@ -6,6 +6,7 @@ import Login from "@/pages/login";
 import Home from "@/pages/home";
 import TopicView from "@/pages/topic";
 import AdminDashboard from "@/pages/admin";
+import ProgressOverview from "@/pages/progress";
 import { useEffect } from "react";
 
 function ProtectedRoute({ component: Component, ...rest }: any) {
@@ -27,6 +28,9 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/">
         {(params) => <ProtectedRoute component={Home} {...params} />}
+      </Route>
+      <Route path="/progress">
+        {(params) => <ProtectedRoute component={ProgressOverview} {...params} />}
       </Route>
       <Route path="/topic/:id">
         {(params) => <ProtectedRoute component={TopicView} {...params} />}
