@@ -3,24 +3,20 @@ import { createServer, type Server } from "http";
 import { SQLiteStorage } from "./sqlite-storage";
 import { SupabaseStorage } from "./supabase-storage";
 
-// Use Supabase if environment variables are set, otherwise SQLite
 const storage = process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
   ? new SupabaseStorage(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
   : new SQLiteStorage();
 
-// Initialize storage (only matters for Supabase to check/create initial data)
 if ('initialize' in storage) {
   storage.initialize().catch(err => console.error('Failed to initialize storage:', err));
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Disable caching for API routes
   app.use('/api/*', (_req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     next();
   });
-
-  // Topics API
+  
   app.get("/api/topics", async (_req, res) => {
     try {
       const topics = await storage.getTopics();
@@ -29,7 +25,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch topics" });
     }
   });
-
+ 
   app.post("/api/topics", async (req, res) => {
     try {
       const topic = req.body;
@@ -68,7 +64,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Progress API
   app.get("/api/progress/:userId", async (req, res) => {
     try {
       const progress = await storage.getProgress(req.params.userId);
@@ -88,7 +83,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Users API
   app.get("/api/users/:id", async (req, res) => {
     try {
       const user = await storage.getUser(req.params.id);
@@ -102,7 +96,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update user (e.g., avatar)
   app.patch("/api/users/:id", async (req, res) => {
     try {
       const updates = req.body;
@@ -117,7 +110,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Login API - authenticate by email
   app.post("/api/login", async (req, res) => {
     try {
       const { email } = req.body;
@@ -125,20 +117,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(400).json({ error: "Email is required" });
         return;
       }
-      
-      const user = await storage.getUserByUsername(email);
+
+      // Normalize email: trim and lowercase to avoid case/whitespace mismatches
+      const normalizedEmail = String(email).trim().toLowerCase();
+
+      const user = await storage.getUserByUsername(normalizedEmail);
       if (!user) {
         res.status(404).json({ error: "User not found" });
         return;
       }
-      
+
       res.json(user);
     } catch (error) {
+      console.error('Login error:', error);
       res.status(500).json({ error: "Failed to login" });
     }
   });
 
-  // Comments API
   app.post("/api/comments", async (req, res) => {
     try {
       const { subtopicId, comment } = req.body;
